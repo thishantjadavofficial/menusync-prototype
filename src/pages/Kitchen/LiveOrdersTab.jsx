@@ -37,7 +37,7 @@ export default function LiveOrdersTab() {
     // Subscribe to new orders
     const subscription = supabase
       .channel('public:orders')
-      .on('postgres_changes', { event: 'INSERT', schema: 'public', table: 'orders', filter: `restaurant_id=eq.${RESTAURANT_ID}` }, payload => {
+      .on('postgres_changes', { event: 'INSERT', schema: 'public', table: 'orders', filter: `restaurant_id=eq.${getRestaurantId()}` }, payload => {
         const newOrder = payload.new
         // Fetch order items for the new order
         fetchOrderItems(newOrder).then(orderWithItems => {
@@ -45,7 +45,7 @@ export default function LiveOrdersTab() {
           playChime()
         })
       })
-      .on('postgres_changes', { event: 'UPDATE', schema: 'public', table: 'orders', filter: `restaurant_id=eq.${RESTAURANT_ID}` }, payload => {
+      .on('postgres_changes', { event: 'UPDATE', schema: 'public', table: 'orders', filter: `restaurant_id=eq.${getRestaurantId()}` }, payload => {
         const updatedOrder = payload.new
         setOrders(prev => {
           // If marked completed, we can either remove it or just update status
