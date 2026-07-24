@@ -1,7 +1,14 @@
 import { createClient } from '@supabase/supabase-js'
 
-const supabaseUrl = import.meta.env.VITE_SUPABASE_URL || 'https://nifzdnjbphgxsxpfowhf.supabase.co'
-const supabaseKey = import.meta.env.VITE_SUPABASE_ANON_KEY || 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im5pZnpkbmpicGhneHN4cGZvd2hmIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODQ4OTA2OTEsImV4cCI6MjEwMDQ2NjY5MX0._OcVoYoc-T415O-S6w2xn0dwfdxWyGXFGpGhJQJoOJc'
+let envUrl = import.meta.env.VITE_SUPABASE_URL || '';
+let envKey = import.meta.env.VITE_SUPABASE_ANON_KEY || '';
+
+// Clean up accidentally pasted quotes from Vercel dashboard
+if (typeof envUrl === 'string') envUrl = envUrl.replace(/^["']|["']$/g, '').trim();
+if (typeof envKey === 'string') envKey = envKey.replace(/^["']|["']$/g, '').trim();
+
+const supabaseUrl = envUrl || 'https://nifzdnjbphgxsxpfowhf.supabase.co'
+const supabaseKey = envKey || 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im5pZnpkbmpicGhneHN4cGZvd2hmIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODQ4OTA2OTEsImV4cCI6MjEwMDQ2NjY5MX0._OcVoYoc-T415O-S6w2xn0dwfdxWyGXFGpGhJQJoOJc'
 
 export const supabase = createClient(supabaseUrl, supabaseKey)
 
