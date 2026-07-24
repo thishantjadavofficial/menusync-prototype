@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react'
-import { supabase, RESTAURANT_ID } from '../../lib/supabase'
+import { supabase, getRestaurantId } from '../../lib/supabase'
 import { Plus, Trash2, GripVertical, ChevronDown, ChevronRight } from 'lucide-react'
 
 export default function MenuBuilderTab() {
@@ -21,8 +21,8 @@ export default function MenuBuilderTab() {
   const fetchMenu = async () => {
     setLoading(true)
     const [catRes, dishRes] = await Promise.all([
-      supabase.from('categories').select('*').eq('restaurant_id', RESTAURANT_ID).order('created_at'),
-      supabase.from('dishes').select('*, categories!inner(restaurant_id)').eq('categories.restaurant_id', RESTAURANT_ID).order('created_at')
+      supabase.from('categories').select('*').eq('restaurant_id', getRestaurantId()).order('created_at'),
+      supabase.from('dishes').select('*, categories!inner(restaurant_id)').eq('categories.restaurant_id', getRestaurantId()).order('created_at')
     ])
     
     if (catRes.data) setCategories(catRes.data)
@@ -46,7 +46,7 @@ export default function MenuBuilderTab() {
     
     const { data, error } = await supabase
       .from('categories')
-      .insert([{ restaurant_id: RESTAURANT_ID, name: newCategoryName }])
+      .insert([{ restaurant_id: getRestaurantId(), name: newCategoryName }])
       .select()
       .single()
       

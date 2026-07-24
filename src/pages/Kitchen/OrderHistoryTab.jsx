@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react'
-import { supabase, RESTAURANT_ID } from '../../lib/supabase'
+import { supabase, getRestaurantId } from '../../lib/supabase'
 import { Calendar, DollarSign, ShoppingBag, TrendingUp, ChevronDown, RefreshCw } from 'lucide-react'
 
 export default function OrderHistoryTab() {
@@ -21,7 +21,7 @@ export default function OrderHistoryTab() {
     const { data, error } = await supabase
       .from('orders')
       .select('*, order_items(*)')
-      .eq('restaurant_id', RESTAURANT_ID)
+      .eq('restaurant_id', getRestaurantId())
       .eq('status', 'completed')
       .order('created_at', { ascending: false })
 

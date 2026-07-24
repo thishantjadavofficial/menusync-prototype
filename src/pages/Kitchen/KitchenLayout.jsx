@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react'
 import { Outlet, NavLink } from 'react-router-dom'
 import { LayoutDashboard, Palette, MenuSquare, QrCode, Receipt } from 'lucide-react'
 import { clsx } from 'clsx'
-import { supabase, RESTAURANT_ID } from '../../lib/supabase'
+import { supabase, getRestaurantId } from '../../lib/supabase'
 
 export default function KitchenLayout() {
   const [restaurantName, setRestaurantName] = useState('Loading...')
@@ -11,7 +11,7 @@ export default function KitchenLayout() {
     const { data, error } = await supabase
       .from('restaurants')
       .select('*')
-      .eq('id', RESTAURANT_ID)
+      .eq('id', getRestaurantId())
       .single()
       
     if (data) {
@@ -20,7 +20,7 @@ export default function KitchenLayout() {
       const { data: newData, error: upsertError } = await supabase
         .from('restaurants')
         .upsert({
-          id: RESTAURANT_ID,
+          id: getRestaurantId(),
           name: 'MenuSync Restaurant',
           primary_color: '#10B981',
           secondary_color: '#047857'

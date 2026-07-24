@@ -1,17 +1,20 @@
 import React, { useState, useEffect } from 'react'
 import { useSearchParams } from 'react-router-dom'
-import { supabase, RESTAURANT_ID } from '../../lib/supabase'
+import { supabase } from '../../lib/supabase'
 import Cart from './components/Cart'
+import { QrCode } from 'lucide-react'
 
 export default function CustomerMenu() {
   const [searchParams] = useSearchParams()
   const tableId = searchParams.get('tableId')
   const tableNum = searchParams.get('tableNum') || 'Unknown Table'
 
+  const [restaurantId, setRestaurantId] = useState(null)
   const [brand, setBrand] = useState(null)
   const [categories, setCategories] = useState([])
   const [dishes, setDishes] = useState([])
   const [activeCategory, setActiveCategory] = useState(null)
+  const [errorMsg, setErrorMsg] = useState(null)
   
   const [cart, setCart] = useState({}) // { dishId: { ...dish, quantity: X } }
   const [isCartOpen, setIsCartOpen] = useState(false)
@@ -25,10 +28,33 @@ export default function CustomerMenu() {
   }, [])
 
   const fetchData = async () => {
+    if (!tableId) {
+      setErrorMsg("Invalid Menu Link. Please scan a table QR code.")
+      setLoading(false)
+      return
+    }
+
+    // 1. Fetch the table to infer the restaurant_id
+    const { data: tableData, error: tableError } = await supabase
+      .from('tables')
+      .select('restaurant_id')
+      .eq('id', tableId)
+      .single()
+
+    if (tableError || !tableData) {
+      setErrorMsg("Table not found. The QR code may be old or invalid.")
+      setLoading(false)
+      return
+    }
+
+    const fetchedRestId = tableData.restaurant_id
+    setRestaurantId(fetchedRestId)
+
+    // 2. Fetch all menu data for this specific restaurant
     const [brandRes, catRes, dishRes] = await Promise.all([
-      supabase.from('restaurants').select('*').eq('id', RESTAURANT_ID).single(),
-      supabase.from('categories').select('*').eq('restaurant_id', RESTAURANT_ID).order('created_at'),
-      supabase.from('dishes').select('*, categories!inner(restaurant_id)').eq('categories.restaurant_id', RESTAURANT_ID).order('created_at')
+      supabase.from('restaurants').select('*').eq('id', fetchedRestId).single(),
+      supabase.from('categories').select('*').eq('restaurant_id', fetchedRestId).order('created_at'),
+      supabase.from('dishes').select('*, categories!inner(restaurant_id)').eq('categories.restaurant_id', fetchedRestId).order('created_at')
     ])
     
     if (brandRes.data) setBrand(brandRes.data)
@@ -74,15 +100,15 @@ export default function CustomerMenu() {
   }
 
   const placeOrder = async () => {
-    if (!tableId || Object.keys(cart).length === 0) return
+    if (!tableId || !restaurantId || Object.keys(cart).length === 0) return
     
     setIsOrdering(true)
     
-    // 1. Create order
+    // 1. Create order linked to the correct restaurant
     const { data: order, error: orderError } = await supabase
       .from('orders')
       .insert([{
-        restaurant_id: RESTAURANT_ID,
+        restaurant_id: restaurantId,
         table_id: tableId,
         table_number: tableNum,
         status: 'pending'
@@ -112,9 +138,21 @@ export default function CustomerMenu() {
     setIsOrdering(false)
   }
 
-  if (loading || !brand) {
-    return <div className="min-h-screen flex items-center justify-center bg-gray-50 text-gray-500">Loading Menu...</div>
+  if (loading) {
+    return <div className="min-h-screen flex items-center justify-center bg-gray-50 text-gray-500 animate-pulse">Loading Menu...</div>
   }
+
+  if (errorMsg) {
+    return (
+      <div className="min-h-screen flex flex-col items-center justify-center bg-gray-50 text-center p-6">
+        <QrCode size={64} className="text-gray-300 mb-6" />
+        <h2 className="text-2xl font-bold text-gray-800 mb-2">Oops!</h2>
+        <p className="text-gray-500">{errorMsg}</p>
+      </div>
+    )
+  }
+
+  if (!brand) return null
 
   return (
     <div className="min-h-screen bg-gray-50 font-sans pb-24">

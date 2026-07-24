@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react'
-import { supabase, RESTAURANT_ID } from '../../lib/supabase'
+import { supabase, getRestaurantId } from '../../lib/supabase'
 import { QRCodeSVG, QRCodeCanvas } from 'qrcode.react'
 import { Plus, Download, Trash2, LayoutDashboard } from 'lucide-react'
 
@@ -17,7 +17,7 @@ export default function TableGeneratorTab() {
     const { data } = await supabase
       .from('tables')
       .select('*')
-      .eq('restaurant_id', RESTAURANT_ID)
+      .eq('restaurant_id', getRestaurantId())
       .order('table_number', { ascending: true })
     
     if (data) setTables(data)
@@ -30,7 +30,7 @@ export default function TableGeneratorTab() {
     
     const { data, error } = await supabase
       .from('tables')
-      .insert([{ restaurant_id: RESTAURANT_ID, table_number: newTable }])
+      .insert([{ restaurant_id: getRestaurantId(), table_number: newTable }])
       .select()
       .single()
       

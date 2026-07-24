@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react'
 import { useOutletContext } from 'react-router-dom'
-import { supabase, RESTAURANT_ID } from '../../lib/supabase'
+import { supabase, getRestaurantId } from '../../lib/supabase'
 import { Save, Check, Upload, Trash2 } from 'lucide-react'
 
 export default function BrandTab() {
@@ -21,7 +21,7 @@ export default function BrandTab() {
       const { data } = await supabase
         .from('restaurants')
         .select('*')
-        .eq('id', RESTAURANT_ID)
+        .eq('id', getRestaurantId())
         .single()
       
       if (data) {
@@ -70,7 +70,7 @@ export default function BrandTab() {
     const { error } = await supabase
       .from('restaurants')
       .upsert({
-        id: RESTAURANT_ID,
+        id: getRestaurantId(),
         name: brand.name,
         logo_url: brand.logo_url,
         primary_color: brand.primary_color,

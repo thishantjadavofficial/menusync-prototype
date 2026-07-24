@@ -1,5 +1,5 @@
 import React, { useEffect, useState, useRef } from 'react'
-import { supabase, RESTAURANT_ID } from '../../lib/supabase'
+import { supabase, getRestaurantId } from '../../lib/supabase'
 import { CheckCircle2, Clock, ChefHat } from 'lucide-react'
 
 // Simple beep sound using Web Audio API
@@ -69,7 +69,7 @@ export default function LiveOrdersTab() {
     const { data: ordersData, error: ordersError } = await supabase
       .from('orders')
       .select('*')
-      .eq('restaurant_id', RESTAURANT_ID)
+      .eq('restaurant_id', getRestaurantId())
       .eq('status', 'pending')
       .order('created_at', { ascending: true }) // Oldest first (highest priority)
 
