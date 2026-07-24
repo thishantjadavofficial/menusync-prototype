@@ -93,7 +93,7 @@ export default function BrandTab() {
   }
 
   return (
-    <div className="max-w-5xl mx-auto flex flex-col md:flex-row gap-8">
+    <div className="max-w-5xl mx-auto flex flex-col lg:flex-row gap-8">
       {/* Editor */}
       <div className="flex-1 bg-white p-6 rounded-2xl shadow-sm border border-gray-200">
         <h2 className="text-2xl font-bold text-gray-900 mb-6">Brand & UI Customization</h2>
@@ -153,7 +153,7 @@ export default function BrandTab() {
             <p className="text-xs text-gray-400 mt-2">Recommended: Square image, max size 2MB</p>
           </div>
 
-          <div className="grid grid-cols-2 gap-6">
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-2">Primary Color</label>
               <div className="flex items-center gap-3">
@@ -162,14 +162,14 @@ export default function BrandTab() {
                   name="primary_color"
                   value={brand.primary_color}
                   onChange={handleChange}
-                  className="w-12 h-12 p-1 bg-white border border-gray-300 rounded-lg cursor-pointer"
+                  className="w-12 h-12 p-1 bg-white border border-gray-300 rounded-lg cursor-pointer shrink-0"
                 />
                 <input
                   type="text"
                   name="primary_color"
                   value={brand.primary_color}
                   onChange={handleChange}
-                  className="flex-1 px-4 py-2 border border-gray-300 rounded-lg uppercase"
+                  className="flex-1 px-4 py-2 border border-gray-300 rounded-lg uppercase min-w-0"
                   maxLength={7}
                 />
               </div>
@@ -183,14 +183,14 @@ export default function BrandTab() {
                   name="secondary_color"
                   value={brand.secondary_color}
                   onChange={handleChange}
-                  className="w-12 h-12 p-1 bg-white border border-gray-300 rounded-lg cursor-pointer"
+                  className="w-12 h-12 p-1 bg-white border border-gray-300 rounded-lg cursor-pointer shrink-0"
                 />
                 <input
                   type="text"
                   name="secondary_color"
                   value={brand.secondary_color}
                   onChange={handleChange}
-                  className="flex-1 px-4 py-2 border border-gray-300 rounded-lg uppercase"
+                  className="flex-1 px-4 py-2 border border-gray-300 rounded-lg uppercase min-w-0"
                   maxLength={7}
                 />
               </div>
@@ -216,7 +216,7 @@ export default function BrandTab() {
       </div>
 
       {/* Live Preview */}
-      <div className="flex-1">
+      <div className="flex-1 hidden lg:block">
         <h3 className="text-sm font-semibold text-gray-500 uppercase tracking-wider mb-4">Live Preview (Customer Menu)</h3>
         
         {/* Mobile Phone Mockup */}

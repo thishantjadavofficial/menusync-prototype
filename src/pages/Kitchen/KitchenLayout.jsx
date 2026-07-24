@@ -1,11 +1,12 @@
 import React, { useState, useEffect } from 'react'
 import { Outlet, NavLink } from 'react-router-dom'
-import { LayoutDashboard, Palette, MenuSquare, QrCode, Receipt } from 'lucide-react'
+import { LayoutDashboard, Palette, MenuSquare, QrCode, Receipt, Menu, X } from 'lucide-react'
 import { clsx } from 'clsx'
 import { supabase, getRestaurantId } from '../../lib/supabase'
 
 export default function KitchenLayout() {
   const [restaurantName, setRestaurantName] = useState('Loading...')
+  const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false)
 
   const fetchRestaurant = async () => {
     const { data, error } = await supabase
@@ -45,39 +46,76 @@ export default function KitchenLayout() {
     { to: 'history', icon: Receipt, label: 'Order History' },
   ]
 
+  const closeMobileMenu = () => setIsMobileMenuOpen(false)
+
   return (
-    <div className="flex h-screen bg-gray-50 text-gray-900">
-      {/* Sidebar */}
-      <aside className="w-64 bg-white border-r border-gray-200 flex flex-col shadow-sm">
-        <div className="p-6 flex items-center gap-3 border-b border-gray-100">
-          {/* MenuSync Premium Logo */}
-          <div className="relative flex items-center justify-center w-10 h-10 bg-gradient-to-tr from-emerald-500 to-emerald-600 text-white rounded-xl shadow-md overflow-hidden shrink-0">
-            <svg 
-              className="w-6 h-6 animate-pulse" 
-              viewBox="0 0 24 24" 
-              fill="none" 
-              stroke="currentColor" 
-              strokeWidth="2.5" 
-              strokeLinecap="round" 
-              strokeLinejoin="round"
-            >
+    <div className="flex h-screen bg-gray-50 text-gray-900 overflow-hidden">
+      
+      {/* Mobile Header */}
+      <div className="md:hidden bg-white border-b border-gray-200 flex items-center justify-between p-4 z-20 absolute top-0 w-full">
+        <div className="flex items-center gap-2">
+          <div className="w-8 h-8 bg-gradient-to-tr from-emerald-500 to-emerald-600 text-white rounded-lg flex items-center justify-center shrink-0">
+            <svg className="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
               <path d="M12 2v20" />
               <path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6" />
-              <circle cx="12" cy="12" r="10" strokeWidth="1" opacity="0.3" />
             </svg>
-            <div className="absolute inset-0 bg-white/10 opacity-0 hover:opacity-100 transition-opacity rounded-xl"></div>
           </div>
-          <h1 className="font-bold text-lg text-gray-800 tracking-tight leading-tight">
-            MenuSync
-            <br/><span className="text-sm font-medium text-gray-500">{restaurantName}</span>
-          </h1>
+          <span className="font-bold text-gray-800">MenuSync</span>
+        </div>
+        <button onClick={() => setIsMobileMenuOpen(true)} className="p-2 text-gray-600 hover:bg-gray-100 rounded-lg">
+          <Menu size={24} />
+        </button>
+      </div>
+
+      {/* Mobile Overlay */}
+      {isMobileMenuOpen && (
+        <div 
+          className="md:hidden fixed inset-0 bg-black/50 z-40 animate-in fade-in duration-200"
+          onClick={closeMobileMenu}
+        />
+      )}
+
+      {/* Sidebar */}
+      <aside className={clsx(
+        "fixed inset-y-0 left-0 z-50 w-64 bg-white border-r border-gray-200 flex flex-col shadow-xl md:shadow-sm transition-transform duration-300 md:relative md:translate-x-0",
+        isMobileMenuOpen ? "translate-x-0" : "-translate-x-full"
+      )}>
+        <div className="p-6 flex items-center justify-between gap-3 border-b border-gray-100">
+          {/* MenuSync Premium Logo */}
+          <div className="flex items-center gap-3">
+            <div className="relative flex items-center justify-center w-10 h-10 bg-gradient-to-tr from-emerald-500 to-emerald-600 text-white rounded-xl shadow-md overflow-hidden shrink-0">
+              <svg 
+                className="w-6 h-6 animate-pulse" 
+                viewBox="0 0 24 24" 
+                fill="none" 
+                stroke="currentColor" 
+                strokeWidth="2.5" 
+                strokeLinecap="round" 
+                strokeLinejoin="round"
+              >
+                <path d="M12 2v20" />
+                <path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6" />
+                <circle cx="12" cy="12" r="10" strokeWidth="1" opacity="0.3" />
+              </svg>
+              <div className="absolute inset-0 bg-white/10 opacity-0 hover:opacity-100 transition-opacity rounded-xl"></div>
+            </div>
+            <h1 className="font-bold text-lg text-gray-800 tracking-tight leading-tight truncate pr-2">
+              MenuSync
+              <br/><span className="text-sm font-medium text-gray-500 truncate block max-w-[120px]">{restaurantName}</span>
+            </h1>
+          </div>
+          
+          <button onClick={closeMobileMenu} className="md:hidden p-2 text-gray-400 hover:text-gray-900 hover:bg-gray-100 rounded-lg shrink-0">
+            <X size={20} />
+          </button>
         </div>
         
-        <nav className="flex-1 p-4 space-y-2">
+        <nav className="flex-1 p-4 space-y-2 overflow-y-auto">
           {navItems.map((item) => (
             <NavLink
               key={item.to}
               to={item.to}
+              onClick={closeMobileMenu}
               className={({ isActive }) =>
                 clsx(
                   'flex items-center gap-3 px-4 py-3 rounded-xl transition-all duration-200 font-medium',
@@ -95,7 +133,7 @@ export default function KitchenLayout() {
       </aside>
 
       {/* Main Content Area */}
-      <main className="flex-1 overflow-auto bg-gray-50 p-8">
+      <main className="flex-1 overflow-auto bg-gray-50 pt-20 pb-8 px-4 md:p-8 md:pt-8 w-full">
         <div className="max-w-6xl mx-auto h-full">
           <Outlet context={{ fetchRestaurant }} />
         </div>

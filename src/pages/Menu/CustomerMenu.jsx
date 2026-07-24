@@ -155,7 +155,7 @@ export default function CustomerMenu() {
   if (!brand) return null
 
   return (
-    <div className="min-h-screen bg-gray-50 font-sans pb-24">
+    <div className="min-h-screen bg-gray-50 font-sans pb-24 md:pb-0">
       {/* Header */}
       <header 
         className="pt-10 pb-6 px-6 text-white text-center shadow-md relative"
@@ -176,75 +176,79 @@ export default function CustomerMenu() {
         </div>
       </header>
 
-      {/* Category Tabs */}
-      <div className="sticky top-0 z-30 bg-white/80 backdrop-blur-md shadow-sm border-b border-gray-100 overflow-x-auto">
-        <div className="flex px-4 py-3 gap-3 min-w-max">
-          {categories.map(cat => (
-            <button
-              key={cat.id}
-              onClick={() => setActiveCategory(cat.id)}
-              className={`px-5 py-2 rounded-full font-medium transition-all duration-200 ${
-                activeCategory === cat.id 
-                  ? 'text-white shadow-md' 
-                  : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
-              }`}
-              style={activeCategory === cat.id ? { backgroundColor: brand.primary_color } : {}}
-            >
-              {cat.name}
-            </button>
-          ))}
-        </div>
-      </div>
-
-      {/* Dishes List */}
-      <div className="p-4 max-w-3xl mx-auto space-y-4">
-        {dishes.filter(d => d.category_id === activeCategory).length === 0 ? (
-          <div className="text-center py-12 text-gray-400 bg-white rounded-2xl border border-gray-200 border-dashed">
-            No dishes in this category yet.
+      {/* Main Content Layout */}
+      <div className="max-w-7xl mx-auto md:px-6 md:py-8 md:grid md:grid-cols-[250px_1fr] md:gap-8 items-start relative">
+        
+        {/* Category Tabs (Horizontal scroll on mobile, sticky sidebar on desktop) */}
+        <div className="sticky top-0 z-30 bg-white/80 backdrop-blur-md shadow-sm border-b border-gray-100 overflow-x-auto md:bg-transparent md:border-none md:shadow-none md:top-8 md:z-10">
+          <div className="flex px-4 py-3 gap-3 min-w-max md:flex-col md:min-w-0 md:px-0 md:py-0">
+            {categories.map(cat => (
+              <button
+                key={cat.id}
+                onClick={() => setActiveCategory(cat.id)}
+                className={`px-5 py-2 rounded-full font-medium transition-all duration-200 md:w-full md:text-left md:px-4 md:py-3 md:rounded-xl ${
+                  activeCategory === cat.id 
+                    ? 'text-white shadow-md' 
+                    : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
+                }`}
+                style={activeCategory === cat.id ? { backgroundColor: brand.primary_color } : {}}
+              >
+                {cat.name}
+              </button>
+            ))}
           </div>
-        ) : (
-          dishes.filter(d => d.category_id === activeCategory).map(dish => {
-            const quantity = cart[dish.id]?.quantity || 0
-            
-            return (
-              <div key={dish.id} className="bg-white p-4 rounded-2xl shadow-sm border border-gray-100 flex justify-between items-center hover:shadow-md transition-shadow">
-                <div className="flex-1 pr-4">
-                  <h3 className="font-bold text-gray-900 text-lg leading-tight mb-1">{dish.name}</h3>
-                  <div className="font-bold" style={{ color: brand.primary_color }}>₹{dish.price}</div>
-                </div>
-                
-                <div>
-                  {quantity === 0 ? (
-                    <button 
-                      onClick={() => addToCart(dish)}
-                      className="px-6 py-2.5 rounded-xl text-white font-semibold text-sm shadow-sm transition-transform active:scale-95"
-                      style={{ backgroundColor: brand.primary_color }}
-                    >
-                      ADD
-                    </button>
-                  ) : (
-                    <div className="flex items-center bg-gray-100 rounded-xl overflow-hidden border border-gray-200 shadow-inner">
-                      <button 
-                        onClick={() => removeFromCart(dish.id)}
-                        className="w-10 h-10 flex items-center justify-center text-gray-700 hover:bg-gray-200 active:bg-gray-300 font-bold transition-colors"
-                      >
-                        -
-                      </button>
-                      <span className="w-10 text-center font-bold text-gray-900">{quantity}</span>
+        </div>
+
+        {/* Dishes List (Stack on mobile, grid on desktop) */}
+        <div className="p-4 w-full space-y-4 md:p-0 md:grid md:grid-cols-2 lg:grid-cols-3 md:gap-4 md:space-y-0">
+          {dishes.filter(d => d.category_id === activeCategory).length === 0 ? (
+            <div className="md:col-span-full text-center py-12 text-gray-400 bg-white rounded-2xl border border-gray-200 border-dashed">
+              No dishes in this category yet.
+            </div>
+          ) : (
+            dishes.filter(d => d.category_id === activeCategory).map(dish => {
+              const quantity = cart[dish.id]?.quantity || 0
+              
+              return (
+                <div key={dish.id} className="bg-white p-4 rounded-2xl shadow-sm border border-gray-100 flex justify-between items-center hover:shadow-md transition-shadow h-full">
+                  <div className="flex-1 pr-4">
+                    <h3 className="font-bold text-gray-900 text-lg leading-tight mb-1">{dish.name}</h3>
+                    <div className="font-bold" style={{ color: brand.primary_color }}>₹{dish.price}</div>
+                  </div>
+                  
+                  <div>
+                    {quantity === 0 ? (
                       <button 
                         onClick={() => addToCart(dish)}
-                        className="w-10 h-10 flex items-center justify-center text-white hover:opacity-90 active:opacity-80 font-bold transition-opacity"
+                        className="px-6 py-2.5 rounded-xl text-white font-semibold text-sm shadow-sm transition-transform active:scale-95 whitespace-nowrap"
                         style={{ backgroundColor: brand.primary_color }}
                       >
-                        +
+                        ADD
                       </button>
-                    </div>
-                  )}
+                    ) : (
+                      <div className="flex items-center bg-gray-100 rounded-xl overflow-hidden border border-gray-200 shadow-inner">
+                        <button 
+                          onClick={() => removeFromCart(dish.id)}
+                          className="w-10 h-10 flex items-center justify-center text-gray-700 hover:bg-gray-200 active:bg-gray-300 font-bold transition-colors"
+                        >
+                          -
+                        </button>
+                        <span className="w-10 text-center font-bold text-gray-900">{quantity}</span>
+                        <button 
+                          onClick={() => addToCart(dish)}
+                          className="w-10 h-10 flex items-center justify-center text-white hover:opacity-90 active:opacity-80 font-bold transition-opacity"
+                          style={{ backgroundColor: brand.primary_color }}
+                        >
+                          +
+                        </button>
+                      </div>
+                    )}
+                  </div>
                 </div>
-              </div>
-            )
-          })
-        )}
+              )
+            })
+          )}
+        </div>
       </div>
 
       <Cart 

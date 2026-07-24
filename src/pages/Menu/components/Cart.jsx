@@ -22,12 +22,20 @@ export default function Cart({ cart, toggleCart, isCartOpen, brand, placeOrder, 
 
   return (
     <>
+      {/* Overlay Backdrop for Desktop (when open) */}
+      {isCartOpen && (
+        <div 
+          className="hidden md:block fixed inset-0 bg-black/40 z-40 animate-in fade-in duration-200"
+          onClick={toggleCart}
+        />
+      )}
+
       {/* Floating Bottom Bar */}
       {totalItems > 0 && !isCartOpen && (
-        <div className="fixed bottom-6 left-4 right-4 z-40 animate-in slide-in-from-bottom-8 duration-300">
+        <div className="fixed bottom-6 left-4 right-4 z-40 md:left-auto md:right-8 md:w-[320px] animate-in slide-in-from-bottom-8 duration-300">
           <button 
             onClick={toggleCart}
-            className="w-full text-white p-4 rounded-2xl flex justify-between items-center shadow-2xl backdrop-blur-md bg-opacity-95 transition-transform active:scale-[0.98]" 
+            className="w-full text-white p-4 rounded-2xl flex justify-between items-center shadow-2xl backdrop-blur-md bg-opacity-95 transition-transform hover:scale-105 active:scale-[0.98]" 
             style={{ backgroundColor: brand.primary_color }}
           >
             <div className="flex items-center gap-3">
@@ -42,10 +50,10 @@ export default function Cart({ cart, toggleCart, isCartOpen, brand, placeOrder, 
         </div>
       )}
 
-      {/* Full Screen Cart Modal */}
+      {/* Cart Modal / Slide-out Drawer */}
       {isCartOpen && (
-        <div className="fixed inset-0 z-50 bg-white flex flex-col animate-in slide-in-from-bottom duration-200">
-          <div className="p-4 flex items-center justify-between border-b border-gray-100" style={{ backgroundColor: brand.secondary_color }}>
+        <div className="fixed inset-0 z-50 bg-white flex flex-col md:inset-y-0 md:left-auto md:right-0 md:w-[400px] md:shadow-2xl animate-in slide-in-from-bottom md:slide-in-from-right duration-300">
+          <div className="p-4 flex items-center justify-between border-b border-gray-100 shrink-0" style={{ backgroundColor: brand.secondary_color }}>
             <h3 className="text-white font-bold text-lg flex items-center gap-2">
               <ShoppingBag size={20} /> Your Order
             </h3>
@@ -54,7 +62,7 @@ export default function Cart({ cart, toggleCart, isCartOpen, brand, placeOrder, 
             </button>
           </div>
 
-          <div className="flex-1 overflow-auto p-4 bg-gray-50">
+          <div className="flex-1 overflow-y-auto p-4 bg-gray-50">
             {totalItems === 0 ? (
               <div className="h-full flex flex-col items-center justify-center text-gray-400">
                 <ShoppingBag size={48} className="mb-4 opacity-50" />
@@ -78,7 +86,7 @@ export default function Cart({ cart, toggleCart, isCartOpen, brand, placeOrder, 
           </div>
 
           {totalItems > 0 && (
-            <div className="p-6 bg-white border-t border-gray-100 shadow-[0_-4px_20px_rgba(0,0,0,0.05)]">
+            <div className="p-6 bg-white border-t border-gray-100 shadow-[0_-4px_20px_rgba(0,0,0,0.05)] shrink-0">
               <div className="flex justify-between items-center mb-6 text-xl font-bold">
                 <span>Total Amount</span>
                 <span style={{ color: brand.primary_color }}>₹{totalPrice}</span>
