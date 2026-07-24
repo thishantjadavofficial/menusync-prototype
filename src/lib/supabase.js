@@ -5,15 +5,26 @@ const supabaseKey = import.meta.env.VITE_SUPABASE_ANON_KEY || 'eyJhbGciOiJIUzI1N
 
 export const supabase = createClient(supabaseUrl, supabaseKey)
 
+// In-memory fallback if localStorage is completely blocked
+let memorySessionId = null;
+
 // Generate or retrieve the Restaurant ID for this specific device session
 export function getRestaurantId() {
+  if (memorySessionId) return memorySessionId;
+  
   const STORAGE_KEY = 'menusync_restaurant_id'
-  let id = localStorage.getItem(STORAGE_KEY)
+  let id = null;
+  
+  try {
+    id = window.localStorage.getItem(STORAGE_KEY)
+  } catch (e) {
+    console.warn("localStorage access denied, using memory session.")
+  }
   
   if (!id) {
-    // Fallback UUID v4 generator if crypto.randomUUID is not available
+    // Fallback UUID v4 generator
     const generateUUID = () => {
-      if (typeof crypto !== 'undefined' && crypto.randomUUID) {
+      if (typeof crypto !== 'undefined' && typeof crypto.randomUUID === 'function') {
         return crypto.randomUUID()
       }
       return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, function(c) {
@@ -24,8 +35,14 @@ export function getRestaurantId() {
     }
     
     id = generateUUID()
-    localStorage.setItem(STORAGE_KEY, id)
+    
+    try {
+      window.localStorage.setItem(STORAGE_KEY, id)
+    } catch (e) {
+      console.warn("localStorage write denied.")
+    }
   }
   
-  return id
+  memorySessionId = id;
+  return id;
 }
